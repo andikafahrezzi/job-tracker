@@ -63,4 +63,29 @@ class ApplicationController extends Controller
 
         return back()->with('success', 'Lamaran berhasil dihapus');
     }
+
+public function updateStatus(Request $request, Application $application)
+{
+    $request->validate([
+        'status' => 'required|in:daftar,interview,diterima,ditolak'
+    ]);
+
+    // Update DB
+    $application->status = $request->status;
+    $application->save();
+
+    return response()->json([
+        'success' => true,
+        'status' => $application->status
+    ]);
+}
+
+public function getJson()
+{
+    $applications = Application::where('user_id', auth()->id())
+        ->orderBy('created_at', 'desc')
+        ->get(['id', 'company_name', 'position', 'status', 'applied_at', 'created_at']);
+    
+    return response()->json($applications);
+}
 }

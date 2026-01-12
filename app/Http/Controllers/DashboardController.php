@@ -24,13 +24,16 @@ class DashboardController extends Controller
                 SUM(status = 'ditolak') as ditolak
             ")
             ->first();
-
+        //  
+        $applications = $user->applications()->latest()->paginate(10);
+        
         return view('dashboard', [
             'total'     => $stats->total,
             'daftar'    => $stats->daftar,
             'interview' => $stats->interview,
             'diterima'  => $stats->diterima,
             'ditolak'   => $stats->ditolak,
+            'applications' => $applications,
         ]);
     }
 }

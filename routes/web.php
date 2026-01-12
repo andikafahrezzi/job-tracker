@@ -30,4 +30,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
 });
 
+
+Route::middleware('auth')->group(function () {
+    Route::resource('applications', ApplicationController::class);
+    Route::put('/applications/{application}/status', [ApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
+    Route::get('/applications/json', [ApplicationController::class, 'getJson'])
+    ->name('applications.json');
+});
+
+
+
+
+
+
 require __DIR__.'/auth.php';
