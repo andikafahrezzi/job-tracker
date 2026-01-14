@@ -8,11 +8,46 @@ use Illuminate\Support\Facades\Auth;
 
 class ApplicationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $applications = $user->applications()->latest()->paginate(10);
+        
+        // Start query
+        $query = $user->applications();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('company_name', 'like', '%' . $search . '%')
+                  ->orWhere('position', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Get applications with pagination
+        $applications = $query->latest()->paginate(12)->withQueryString();
+
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $applications->items(),
+                'pagination' => [
+                    'total' => $applications->total(),
+                    'per_page' => $applications->perPage(),
+                    'current_page' => $applications->currentPage(),
+                    'last_page' => $applications->lastPage(),
+                    'from' => $applications->firstItem(),
+                    'to' => $applications->lastItem(),
+                ]
+            ]);
+        }
 
         return view('applications.index', compact('applications'));
     }
@@ -29,63 +64,87 @@ class ApplicationController extends Controller
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
-            'salary_estimation' => 'nullable|integer',
+            'salary_estimation' => 'nullable|string|max:255',
             'status' => 'required|in:daftar,interview,diterima,ditolak',
         ]);
+        
         /** @var \App\Models\User $user */
         $user->applications()->create($validated);
 
-        return redirect()->route('applications.index')->with('success', 'Lamaran berhasil ditambahkan');
+        return redirect()->route('applications.index')->with('success', 'Lamaran berhasil ditambahkan! 🎉');
     }
 
     public function edit(Application $application)
     {
+        // Check authorization
+        if ($application->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         return view('applications.edit', compact('application'));
     }
 
     public function update(Request $request, Application $application)
     {
+        // Check authorization
+        if ($application->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
-            'salary_estimation' => 'nullable|integer',
+            'salary_estimation' => 'nullable|string|max:255',
             'status' => 'required|in:daftar,interview,diterima,ditolak',
         ]);
 
         $application->update($validated);
 
-        return redirect()->route('applications.index')->with('success', 'Lamaran berhasil diperbarui');
+        return redirect()->route('applications.index')->with('success', 'Lamaran berhasil diperbarui! ✅');
     }
 
     public function destroy(Application $application)
     {
+        // Check authorization
+        if ($application->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         $application->delete();
 
-        return back()->with('success', 'Lamaran berhasil dihapus');
+        return back()->with('success', 'Lamaran berhasil dihapus! 🗑️');
     }
 
-public function updateStatus(Request $request, Application $application)
-{
-    $request->validate([
-        'status' => 'required|in:daftar,interview,diterima,ditolak'
-    ]);
+    public function updateStatus(Request $request, Application $application)
+    {
+        // Check authorization
+        if ($application->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
-    // Update DB
-    $application->status = $request->status;
-    $application->save();
+        $request->validate([
+            'status' => 'required|in:daftar,interview,diterima,ditolak'
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'status' => $application->status
-    ]);
-}
+        // Update status
+        $application->update(['status' => $request->status]);
 
-public function getJson()
-{
-    $applications = Application::where('user_id', auth()->id())
-        ->orderBy('created_at', 'desc')
-        ->get(['id', 'company_name', 'position', 'status', 'applied_at', 'created_at']);
-    
-    return response()->json($applications);
-}
+        return response()->json([
+            'success' => true,
+            'status' => $application->status,
+            'message' => 'Status berhasil diupdate!'
+        ]);
+    }
+
+    public function getJson()
+    {
+        $applications = Application::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'company_name', 'position', 'status', 'salary_estimation', 'created_at', 'updated_at']);
+        
+        return response()->json($applications);
+    }
 }

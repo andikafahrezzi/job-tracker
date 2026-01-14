@@ -4,7 +4,14 @@
 @section('page-title', 'Daftar Lamaran')
 
 @section('content')
-<div x-data="{ view: 'grid', searchQuery: '', statusFilter: 'all' }">
+<div x-data="{ 
+    view: '{{ request()->cookie('view_mode', 'grid') }}',
+    init() {
+        this.$watch('view', value => {
+            document.cookie = `view_mode=${value}; path=/; max-age=31536000`;
+        });
+    }
+}">
     <!-- Header Section with Stats -->
     <div class="mb-8">
         <!-- Title & Action -->
@@ -32,6 +39,15 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            @php
+                $totalCount = $applications->total();
+                $allApplications = auth()->user()->applications;
+                $daftarCount = $allApplications->where('status', 'daftar')->count();
+                $interviewCount = $allApplications->where('status', 'interview')->count();
+                $diterimaCount = $allApplications->where('status', 'diterima')->count();
+                $ditolakCount = $allApplications->where('status', 'ditolak')->count();
+            @endphp
+
             <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 bg-blue-100 rounded-lg">
@@ -41,7 +57,7 @@
                     </div>
                     <div>
                         <p class="text-xs font-medium text-gray-600">Total</p>
-                        <p class="text-xl font-bold text-gray-900">{{ $applications->total() }}</p>
+                        <p class="text-xl font-bold text-gray-900">{{ $totalCount }}</p>
                     </div>
                 </div>
             </div>
@@ -55,7 +71,7 @@
                     </div>
                     <div>
                         <p class="text-xs font-medium text-gray-600">Interview</p>
-                        <p class="text-xl font-bold text-gray-900">{{ $applications->where('status', 'interview')->count() }}</p>
+                        <p class="text-xl font-bold text-gray-900">{{ $interviewCount }}</p>
                     </div>
                 </div>
             </div>
@@ -69,7 +85,7 @@
                     </div>
                     <div>
                         <p class="text-xs font-medium text-gray-600">Diterima</p>
-                        <p class="text-xl font-bold text-gray-900">{{ $applications->where('status', 'diterima')->count() }}</p>
+                        <p class="text-xl font-bold text-gray-900">{{ $diterimaCount }}</p>
                     </div>
                 </div>
             </div>
@@ -83,14 +99,14 @@
                     </div>
                     <div>
                         <p class="text-xs font-medium text-gray-600">Ditolak</p>
-                        <p class="text-xl font-bold text-gray-900">{{ $applications->where('status', 'ditolak')->count() }}</p>
+                        <p class="text-xl font-bold text-gray-900">{{ $ditolakCount }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Filters & View Toggle -->
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <form method="GET" action="{{ route('applications.index') }}" class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
             <!-- Search -->
             <div class="flex-1 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -98,32 +114,39 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </div>
-                <input x-model="searchQuery" 
+                <input name="search" 
                        type="text" 
+                       value="{{ request('search') }}"
                        placeholder="Cari perusahaan atau posisi..." 
                        class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
             </div>
 
             <!-- Status Filter -->
-            <select x-model="statusFilter" 
+            <select name="status" 
+                    onchange="this.form.submit()"
                     class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium">
-                <option value="all">Semua Status</option>
-                <option value="daftar">Daftar</option>
-                <option value="interview">Interview</option>
-                <option value="diterima">Diterima</option>
-                <option value="ditolak">Ditolak</option>
+                <option value="all" {{ request('status', 'all') == 'all' ? 'selected' : '' }}>Semua Status</option>
+                <option value="daftar" {{ request('status') == 'daftar' ? 'selected' : '' }}>Daftar</option>
+                <option value="interview" {{ request('status') == 'interview' ? 'selected' : '' }}>Interview</option>
+                <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
             </select>
 
+            <!-- Search Button (Mobile) -->
+            <button type="submit" class="sm:hidden px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                Cari
+            </button>
+
             <!-- View Toggle -->
-            <div class="flex bg-gray-100 rounded-lg p-1">
-                <button @click="view = 'grid'" 
+            <div class="hidden sm:flex bg-gray-100 rounded-lg p-1">
+                <button type="button" @click="view = 'grid'" 
                         :class="view === 'grid' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
                         class="px-3 py-2 rounded-md transition-all text-sm font-medium">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                     </svg>
                 </button>
-                <button @click="view = 'list'" 
+                <button type="button" @click="view = 'list'" 
                         :class="view === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
                         class="px-3 py-2 rounded-md transition-all text-sm font-medium">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,11 +154,26 @@
                     </svg>
                 </button>
             </div>
-        </div>
+
+            <!-- Clear Filter -->
+            @if(request('search') || request('status') != 'all')
+            <a href="{{ route('applications.index') }}" 
+               class="hidden sm:inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Reset
+            </a>
+            @endif
+        </form>
     </div>
 
     <!-- Grid View -->
-    <div x-show="view === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+    <div x-show="view === 'grid'" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         @forelse($applications as $app)
         <div class="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
             <!-- Card Header -->
@@ -227,22 +265,49 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Belum ada lamaran</h3>
-                <p class="text-sm text-gray-600 mb-6 max-w-sm mx-auto">Mulai perjalanan karirmu dengan menambahkan lamaran kerja pertama</p>
-                <a href="{{ route('applications.create') }}" 
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/50 transition-all transform hover:scale-105">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Tambah Lamaran Pertama
-                </a>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                    @if(request('search') || request('status') != 'all')
+                        Tidak ada hasil yang ditemukan
+                    @else
+                        Belum ada lamaran
+                    @endif
+                </h3>
+                <p class="text-sm text-gray-600 mb-6 max-w-sm mx-auto">
+                    @if(request('search') || request('status') != 'all')
+                        Coba ubah filter atau kata kunci pencarian Anda
+                    @else
+                        Mulai perjalanan karirmu dengan menambahkan lamaran kerja pertama
+                    @endif
+                </p>
+                @if(request('search') || request('status') != 'all')
+                    <a href="{{ route('applications.index') }}" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white text-sm font-bold rounded-xl hover:bg-gray-700 shadow-lg transition-all transform hover:scale-105">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Reset Filter
+                    </a>
+                @else
+                    <a href="{{ route('applications.create') }}" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/50 transition-all transform hover:scale-105">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Lamaran Pertama
+                    </a>
+                @endif
             </div>
         </div>
         @endforelse
     </div>
 
     <!-- List View -->
-    <div x-show="view === 'list'" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div x-show="view === 'list'" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
+         style="display: none;">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gradient-to-r from-gray-50 to-blue-50 border-b-2 border-gray-200">
@@ -342,15 +407,37 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                 </div>
-                                <h3 class="text-lg font-bold text-gray-900 mb-2">Belum ada lamaran</h3>
-                                <p class="text-sm text-gray-600 mb-6">Mulai perjalanan karirmu dengan menambahkan lamaran kerja pertama</p>
-                                <a href="{{ route('applications.create') }}" 
-                                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/50 transition-all transform hover:scale-105">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                    Tambah Lamaran Pertama
-                                </a>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    @if(request('search') || request('status') != 'all')
+                                        Tidak ada hasil yang ditemukan
+                                    @else
+                                        Belum ada lamaran
+                                    @endif
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-6">
+                                    @if(request('search') || request('status') != 'all')
+                                        Coba ubah filter atau kata kunci pencarian Anda
+                                    @else
+                                        Mulai perjalanan karirmu dengan menambahkan lamaran kerja pertama
+                                    @endif
+                                </p>
+                                @if(request('search') || request('status') != 'all')
+                                    <a href="{{ route('applications.index') }}" 
+                                       class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white text-sm font-bold rounded-xl hover:bg-gray-700 shadow-lg transition-all transform hover:scale-105">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        Reset Filter
+                                    </a>
+                                @else
+                                    <a href="{{ route('applications.create') }}" 
+                                       class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/50 transition-all transform hover:scale-105">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Tambah Lamaran Pertama
+                                    </a>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -363,7 +450,7 @@
     <!-- Pagination -->
     @if($applications->hasPages())
     <div class="mt-8">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="text-sm text-gray-700">
                 Menampilkan <span class="font-semibold">{{ $applications->firstItem() }}</span> 
                 sampai <span class="font-semibold">{{ $applications->lastItem() }}</span> 
@@ -411,6 +498,11 @@ async function updateStatus(appId, newStatus, viewType = 'table') {
             select.dataset.oldStatus = newStatus;
             updateSelectColor(select, newStatus);
             showNotification('Status berhasil diupdate!', 'success');
+            
+            // Reload after 1 second to update stats
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }
         
     } catch (error) {
@@ -433,16 +525,21 @@ function updateSelectColor(select, status) {
         'ditolak': 'text-red-700 bg-red-50'
     };
     
-    select.className += ' ' + (colors[status] || 'text-gray-700 bg-gray-50');
+    const baseClasses = 'text-xs font-semibold rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 py-1.5 px-2';
+    select.className = `${baseClasses} ${colors[status] || 'text-gray-700 bg-gray-50'}`;
 }
 
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 ${
+    notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 flex items-center gap-3 ${
         type === 'success' ? 'bg-green-500' : 'bg-red-500'
     } text-white font-semibold`;
-    notification.textContent = message;
     
+    const icon = type === 'success' 
+        ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+    
+    notification.innerHTML = icon + '<span>' + message + '</span>';
     document.body.appendChild(notification);
     
     setTimeout(() => {

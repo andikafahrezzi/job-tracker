@@ -3,36 +3,52 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Models\Application;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        /** @var \App\Models\User $user */
+         /** @var \App\Models\User $user */
         $user = Auth::user();
-
-        if (!$user) abort(403);
-
-        // 1 query untuk semua statistik
-        $stats = Application::where('user_id', $user->id)
-            ->selectRaw("
-                COUNT(*) as total,
-                SUM(status = 'daftar') as daftar,
-                SUM(status = 'interview') as interview,
-                SUM(status = 'diterima') as diterima,
-                SUM(status = 'ditolak') as ditolak
-            ")
-            ->first();
-        //  
-        $applications = $user->applications()->latest()->paginate(10);
         
+        // Start query
+        $query = $user->applications();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('company_name', 'like', '%' . $search . '%')
+                  ->orWhere('position', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Get applications with pagination
+        $applications = $query->latest()->paginate(12)->withQueryString();
+
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $applications->items(),
+                'pagination' => [
+                    'total' => $applications->total(),
+                    'per_page' => $applications->perPage(),
+                    'current_page' => $applications->currentPage(),
+                    'last_page' => $applications->lastPage(),
+                    'from' => $applications->firstItem(),
+                    'to' => $applications->lastItem(),
+                ]
+            ]);
+        }
         return view('dashboard', [
-            'total'     => $stats->total,
-            'daftar'    => $stats->daftar,
-            'interview' => $stats->interview,
-            'diterima'  => $stats->diterima,
-            'ditolak'   => $stats->ditolak,
             'applications' => $applications,
         ]);
     }
