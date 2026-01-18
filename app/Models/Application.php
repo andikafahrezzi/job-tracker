@@ -13,6 +13,10 @@ class Application extends Model
         'position',
         'salary_estimation',
         'status',
+        'interview_at',
+    ];
+    protected $casts = [
+        'interview_at' => 'datetime',
     ];
 
     // RELASI BALIK KE USER

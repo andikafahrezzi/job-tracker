@@ -106,25 +106,38 @@ public function update(Request $request, Application $application)
         abort(403);
     }
 
+    // 1️⃣ VALIDATION
     $validated = $request->validate([
-        'company_name' => 'required|string|max:255',
-        'position' => 'required|string|max:255',
-        'salary_estimation' => 'nullable|string|max:255',
-        'status' => 'required|in:daftar,interview,diterima,ditolak',
-        'notes' => 'nullable|string',
+        'company_name'       => 'required|string|max:255',
+        'position'           => 'required|string|max:255',
+        'salary_estimation'  => 'nullable|string|max:255',
+        'status'             => 'required|in:daftar,interview,diterima,ditolak',
+        'notes'              => 'nullable|string',
+        'interview_at'       => 'nullable|date',
     ]);
 
+    // 2️⃣ DATA APPLICATION (EXCEPT NOTES)
+    $applicationData = collect($validated)
+        ->except('notes')
+        ->toArray();
 
-    $application->update(
-        collect($validated)->except('notes')->toArray()
-    );
+    // 3️⃣ HANDLE INTERVIEW DATE
+    if ($validated['status'] === 'interview') {
+        $applicationData['interview_at'] = $validated['interview_at'];
+    } else {
+        $applicationData['interview_at'] = null;
+    }
 
-    
+    $application->update($applicationData);
+
+    // 4️⃣ NOTES (HAS MANY, SINGLE RECORD)
     if (array_key_exists('notes', $validated)) {
         $note = $application->notes()->first();
 
         if ($note) {
-            $note->update(['content' => $validated['notes']]);
+            $note->update([
+                'content' => $validated['notes']
+            ]);
         } elseif (!empty($validated['notes'])) {
             $application->notes()->create([
                 'content' => $validated['notes'],
@@ -136,6 +149,7 @@ public function update(Request $request, Application $application)
         ->route('applications.index')
         ->with('success', 'Lamaran berhasil diperbarui! ✅');
 }
+
 
     public function destroy(Application $application)
     {

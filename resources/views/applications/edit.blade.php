@@ -181,6 +181,29 @@
                 @enderror
             </div>
 
+            <!-- Interview Schedule -->
+            <div id="interviewField" class="space-y-2 hidden">
+                <label for="interview_at" class="flex items-center gap-2 text-sm font-bold text-gray-700">
+                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Jadwal Wawancara</span>
+                </label>
+
+                <input
+                    type="datetime-local"
+                    name="interview_at"
+                    id="interview_at"
+                    value="{{ old('interview_at', optional($application->interview_at)->format('Y-m-d\TH:i')) }}"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/20 transition-all outline-none"
+                >
+
+                <p class="text-xs text-gray-500">
+                    Digunakan untuk reminder wawancara
+                </p>
+            </div>
+
             <!-- Divider -->
             <div class="border-t border-gray-200 pt-6">
                 <!-- Action Buttons -->
@@ -234,4 +257,25 @@
         </div>
     </div>
 </div>
+<script>
+    const statusRadios = document.querySelectorAll('input[name="status"]');
+    const interviewField = document.getElementById('interviewField');
+
+    function toggleInterviewField() {
+        const checked = document.querySelector('input[name="status"]:checked');
+        if (checked && checked.value === 'interview') {
+            interviewField.classList.remove('hidden');
+        } else {
+            interviewField.classList.add('hidden');
+        }
+    }
+
+    // initial load
+    toggleInterviewField();
+
+    statusRadios.forEach(radio => {
+        radio.addEventListener('change', toggleInterviewField);
+    });
+</script>
+
 @endsection

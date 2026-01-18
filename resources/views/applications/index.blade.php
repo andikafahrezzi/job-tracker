@@ -229,6 +229,25 @@
                 </div>
             </div>
 
+            @if($app->status === 'interview')
+                <div class="flex items-start gap-2 text-sm">
+                    <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+
+                    @if($app->interview_at)
+                        <span class="font-semibold text-yellow-800">
+                            {{ \Carbon\Carbon::parse($app->interview_at)->format('d M Y · H:i') }}
+                        </span>
+                    @else
+                        <span class="text-red-600 font-semibold text-xs">
+                            ⚠️ Jadwal interview belum diatur
+                        </span>
+                    @endif
+                </div>
+            @endif
+
             <!-- Card Footer -->
             <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -324,6 +343,9 @@
                         <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                             Status
                         </th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                            Interview
+                        </th>
                         <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                             Aksi
                         </th>
@@ -371,6 +393,25 @@
                                     </svg>
                                 </span>
                             </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($app->status === 'interview')
+                                @if($app->interview_at)
+                                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-semibold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10"/>
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($app->interview_at)->format('d M Y · H:i') }}
+                                    </span>
+                                @else
+                                    <span class="text-xs font-semibold text-red-600">
+                                        ⚠️ Belum dijadwalkan
+                                    </span>
+                                @endif
+                            @else
+                                <span class="text-gray-400 text-xs">—</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center justify-center gap-2">
