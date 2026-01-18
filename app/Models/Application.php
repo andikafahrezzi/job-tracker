@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\ApplicationNote;
 
 class Application extends Model
 {
@@ -18,5 +19,9 @@ class Application extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function notes()
+    {
+        return $this->hasMany(ApplicationNote::class);
     }
 }

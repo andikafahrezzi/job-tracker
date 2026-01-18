@@ -57,22 +57,37 @@ class ApplicationController extends Controller
         return view('applications.create');
     }
 
-    public function store(Request $request)
-    {
-        $user = Auth::user();
+public function store(Request $request)
+{
+    $user = Auth::user();
 
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'salary_estimation' => 'nullable|string|max:255',
-            'status' => 'required|in:daftar,interview,diterima,ditolak',
+    $validated = $request->validate([
+        'company_name' => 'required|string|max:255',
+        'position' => 'required|string|max:255',
+        'salary_estimation' => 'nullable|string|max:255',
+        'status' => 'required|in:daftar,interview,diterima,ditolak',
+        'notes' => 'nullable|string',
+    ]);
+
+    /** @var \App\Models\User $user */
+    $application = $user->applications()->create(
+        collect($validated)->except('notes')->toArray()
+    );
+
+    
+    if (!empty($validated['notes'])) {
+        $application->notes()->create([
+            'content' => $validated['notes'],
         ]);
-        
-        /** @var \App\Models\User $user */
-        $user->applications()->create($validated);
-
-        return redirect()->route('applications.index')->with('success', 'Lamaran berhasil ditambahkan! 🎉');
     }
+
+    return redirect()
+        ->route('applications.index')
+        ->with('success', 'Lamaran berhasil ditambahkan! 🎉');
+}
+
+
+
 
     public function edit(Application $application)
     {
@@ -80,28 +95,47 @@ class ApplicationController extends Controller
         if ($application->user_id !== Auth::id()) {
             abort(403);
         }
+         $application->load('notes'); 
 
         return view('applications.edit', compact('application'));
     }
 
-    public function update(Request $request, Application $application)
-    {
-        // Check authorization
-        if ($application->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'salary_estimation' => 'nullable|string|max:255',
-            'status' => 'required|in:daftar,interview,diterima,ditolak',
-        ]);
-
-        $application->update($validated);
-
-        return redirect()->route('applications.index')->with('success', 'Lamaran berhasil diperbarui! ✅');
+public function update(Request $request, Application $application)
+{
+    if ($application->user_id !== Auth::id()) {
+        abort(403);
     }
+
+    $validated = $request->validate([
+        'company_name' => 'required|string|max:255',
+        'position' => 'required|string|max:255',
+        'salary_estimation' => 'nullable|string|max:255',
+        'status' => 'required|in:daftar,interview,diterima,ditolak',
+        'notes' => 'nullable|string',
+    ]);
+
+
+    $application->update(
+        collect($validated)->except('notes')->toArray()
+    );
+
+    
+    if (array_key_exists('notes', $validated)) {
+        $note = $application->notes()->first();
+
+        if ($note) {
+            $note->update(['content' => $validated['notes']]);
+        } elseif (!empty($validated['notes'])) {
+            $application->notes()->create([
+                'content' => $validated['notes'],
+            ]);
+        }
+    }
+
+    return redirect()
+        ->route('applications.index')
+        ->with('success', 'Lamaran berhasil diperbarui! ✅');
+}
 
     public function destroy(Application $application)
     {

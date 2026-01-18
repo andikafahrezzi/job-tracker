@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ApplicationNoteController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,7 +37,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/applications/{application}/status', [ApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
     Route::get('/applications/json', [ApplicationController::class, 'getJson'])
     ->name('applications.json');
+    Route::post('/applications/{application}/notes', 
+    [ApplicationNoteController::class, 'store']
+)->name('applications.notes.store');
+
 });
+
+
 
 
 

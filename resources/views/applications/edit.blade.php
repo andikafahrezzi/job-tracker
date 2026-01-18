@@ -89,6 +89,25 @@
                     </p>
                 @enderror
             </div>
+            <!-- Notes -->
+            <div class="space-y-2">
+                <label for="notes" class="flex items-center gap-2 text-sm font-bold text-gray-700">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span> Notes </span>
+                    <span class="text-red-500">*</span>
+                </label>
+                <textarea
+    id="notes"
+    rows="4"
+    name="notes"
+    placeholder="Contoh: HR minta follow up minggu depan"
+    class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all outline-none text-gray-900 placeholder-gray-400 @error('notes') border-red-500 @enderror"
+    required
+>{{ old('notes', $application->notes->first()?->content) }}</textarea>
+
+            </div>
 
             <!-- Salary Estimation -->
             <div class="space-y-2">
