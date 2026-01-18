@@ -27,7 +27,34 @@
                     Total {{ $applications->total() }} lamaran terdaftar
                 </p>
             </div>
-            
+            @if($reminders->count())
+<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-6">
+    <h3 class="font-bold text-yellow-800 mb-3 flex items-center gap-2">
+        ⏰ Interview Reminder
+    </h3>
+
+    <ul class="space-y-3">
+        @foreach($reminders as $app)
+            <li class="flex justify-between items-start bg-white p-4 rounded-lg shadow">
+                <div>
+                    <p class="font-semibold text-gray-800">
+                        {{ $app->company_name }} — {{ $app->position }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        📅 {{ $app->interview_at->format('d M Y, H:i') }}
+                    </p>
+                </div>
+
+                <a href="{{ route('applications.edit', $app) }}"
+                   class="text-sm text-indigo-600 hover:underline">
+                    Edit
+                </a>
+            </li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
             <a href="{{ route('applications.create') }}" 
                class="group inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/60 transition-all duration-200 transform hover:scale-105">
                 <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">

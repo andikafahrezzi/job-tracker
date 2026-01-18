@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Application;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -32,7 +33,15 @@ class DashboardController extends Controller
 
         // Get applications with pagination
         $applications = $query->latest()->paginate(12)->withQueryString();
-
+        $reminders = Application::where('user_id', Auth::id())
+            ->where('status', 'interview')
+            ->whereNotNull('interview_at')
+            ->whereBetween('interview_at', [
+                Carbon::now(),
+                Carbon::now()->addDays(3),
+            ])
+            ->orderBy('interview_at')
+            ->get();
         // Return JSON for AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

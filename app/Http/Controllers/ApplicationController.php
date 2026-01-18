@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ApplicationController extends Controller
 {
@@ -29,10 +30,18 @@ class ApplicationController extends Controller
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
-
+        
         // Get applications with pagination
         $applications = $query->latest()->paginate(12)->withQueryString();
-
+        $reminders = Application::where('user_id', Auth::id())
+            ->where('status', 'interview')
+            ->whereNotNull('interview_at')
+            ->whereBetween('interview_at', [
+                Carbon::now(),
+                Carbon::now()->addDays(3),
+            ])
+            ->orderBy('interview_at')
+            ->get();
         // Return JSON for AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -49,7 +58,7 @@ class ApplicationController extends Controller
             ]);
         }
 
-        return view('applications.index', compact('applications'));
+        return view('applications.index', compact(['applications', 'reminders']));
     }
 
     public function create()
