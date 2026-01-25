@@ -27,7 +27,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/applications/create', [ApplicationController::class, 'create'])->name('applications.create');
     Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications/{application}/edit', [ApplicationController::class, 'edit'])->name('applications.edit');
-    Route::put('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
     Route::delete('/applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
 });
 
