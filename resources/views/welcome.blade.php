@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Tracker - Kelola Lamaran Kerja dengan Mudah</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('images/ac.jpeg') }}" type="image/jpeg">
+    <link rel="shortcut icon" href="{{ asset('images/ac.jpeg') }}" type="image/jpeg">
+
+    <!-- Untuk format PNG -->
+    <link rel="icon" href="{{ asset('images/ac.jpeg') }}" type="image/jpeg">
 </head>
 <body class="antialiased">
     <!-- Navigation -->

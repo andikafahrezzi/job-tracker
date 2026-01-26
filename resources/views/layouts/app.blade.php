@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Job Tracker')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('images/ac.jpeg') }}" type="image/jpeg">
+    <link rel="shortcut icon" href="{{ asset('images/ac.jpeg') }}" type="image/jpeg">
 
+    <!-- Untuk format PNG -->
+    <link rel="icon" href="{{ asset('images/ac.jpeg') }}" type="image/jpeg">
 </head>
 <body class="h-full">
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
