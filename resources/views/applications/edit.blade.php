@@ -143,34 +143,136 @@
             </div>
 
             <!-- Status -->
+            <!-- Status Selection dengan Visual Feedback -->
             <div class="space-y-2">
-                <label for="status" class="flex items-center gap-2 text-sm font-bold text-gray-700">
+                <label for="status" class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
                     <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                     </svg>
                     <span>Status Lamaran</span>
                     <span class="text-red-500">*</span>
                 </label>
+                
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    @foreach(['daftar' => ['color' => 'blue', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'], 
-                              'interview' => ['color' => 'yellow', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'], 
-                              'diterima' => ['color' => 'green', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'], 
-                              'ditolak' => ['color' => 'red', 'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z']] as $status => $config)
-                        <label class="relative cursor-pointer group">
-                            <input type="radio" 
-                                   name="status" 
-                                   value="{{ $status }}" 
-                                   class="peer sr-only" 
-                                   {{ old('status', $application->status) === $status ? 'checked' : '' }}>
-                            <div class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all peer-checked:border-{{ $config['color'] }}-500 peer-checked:bg-{{ $config['color'] }}-50 peer-checked:shadow-lg peer-checked:shadow-{{ $config['color'] }}-500/30 hover:border-{{ $config['color'] }}-300 hover:bg-{{ $config['color'] }}-50/50">
-                                <svg class="w-6 h-6 text-{{ $config['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $config['icon'] }}"/>
+                    <!-- Daftar -->
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" 
+                            name="status" 
+                            value="daftar" 
+                            class="peer sr-only status-radio" 
+                            {{ old('status', $application->status) === 'daftar' ? 'checked' : '' }}>
+                        
+                        <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                                    peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                                    hover:border-blue-400 hover:bg-blue-50 hover:scale-102
+                                    active:scale-95">
+                            
+                            <!-- Checkmark Badge -->
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
-                                <span class="text-xs font-bold text-gray-700">{{ ucfirst($status) }}</span>
                             </div>
-                        </label>
-                    @endforeach
+                            
+                            <!-- Icon -->
+                            <div class="p-2 rounded-lg bg-blue-100 transition-all duration-200 peer-checked:bg-green-100">
+                                <svg class="w-6 h-6 text-blue-600 peer-checked:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            
+                            <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Daftar</span>
+                        </div>
+                    </label>
+
+                    <!-- Interview -->
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" 
+                            name="status" 
+                            value="interview" 
+                            class="peer sr-only status-radio" 
+                            {{ old('status', $application->status) === 'interview' ? 'checked' : '' }}>
+                        
+                        <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                                    peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                                    hover:border-yellow-400 hover:bg-yellow-50 hover:scale-102
+                                    active:scale-95">
+                            
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="p-2 rounded-lg bg-yellow-100 transition-all duration-200 peer-checked:bg-green-100">
+                                <svg class="w-6 h-6 text-yellow-600 peer-checked:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            
+                            <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Interview</span>
+                        </div>
+                    </label>
+
+                    <!-- Diterima -->
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" 
+                            name="status" 
+                            value="diterima" 
+                            class="peer sr-only status-radio" 
+                            {{ old('status', $application->status) === 'diterima' ? 'checked' : '' }}>
+                        
+                        <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                                    peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                                    hover:border-green-400 hover:bg-green-50 hover:scale-102
+                                    active:scale-95">
+                            
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="p-2 rounded-lg bg-green-100 transition-all duration-200">
+                                <svg class="w-6 h-6 text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            
+                            <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Diterima</span>
+                        </div>
+                    </label>
+
+                    <!-- Ditolak -->
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" 
+                            name="status" 
+                            value="ditolak" 
+                            class="peer sr-only status-radio" 
+                            {{ old('status', $application->status) === 'ditolak' ? 'checked' : '' }}>
+                        
+                        <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                                    peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                                    hover:border-red-400 hover:bg-red-50 hover:scale-102
+                                    active:scale-95">
+                            
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="p-2 rounded-lg bg-red-100 transition-all duration-200 peer-checked:bg-green-100">
+                                <svg class="w-6 h-6 text-red-600 peer-checked:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            
+                            <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Ditolak</span>
+                        </div>
+                    </label>
                 </div>
+                
                 @error('status')
                     <p class="flex items-center gap-1 text-sm text-red-600 font-medium mt-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,27 +283,59 @@
                 @enderror
             </div>
 
-            <!-- Interview Schedule -->
-            <div id="interviewField" class="space-y-2 hidden">
+            <!-- Interview Schedule Field (with smooth animation) -->
+            <div id="interviewField" 
+                class="space-y-2 {{ old('status', $application->status) === 'interview' ? '' : 'hidden' }}"
+                x-data="{ show: {{ old('status', $application->status) === 'interview' ? 'true' : 'false' }} }"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-2">
+                
+                <!-- Label dengan design yang lebih menarik -->
                 <label for="interview_at" class="flex items-center gap-2 text-sm font-bold text-gray-700">
-                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+                    <div class="p-1.5 bg-yellow-100 rounded-lg">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
                     <span>Jadwal Wawancara</span>
+                    <span class="ml-auto text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">Opsional</span>
                 </label>
 
-                <input
-                    type="datetime-local"
-                    name="interview_at"
-                    id="interview_at"
-                    value="{{ old('interview_at', optional($application->interview_at)->format('Y-m-d\TH:i')) }}"
-                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/20 transition-all outline-none"
-                >
+                <!-- Input dengan icon -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <input type="datetime-local"
+                        name="interview_at"
+                        id="interview_at"
+                        value="{{ old('interview_at', optional($application->interview_at)->format('Y-m-d\TH:i')) }}"
+                        class="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-yellow-300 bg-yellow-50/50 focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/20 transition-all outline-none text-gray-900 font-medium">
+                </div>
 
-                <p class="text-xs text-gray-500">
-                    Digunakan untuk reminder wawancara
-                </p>
+                <!-- Info box dengan design menarik -->
+                <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-semibold text-yellow-800 mb-1">💡 Reminder Otomatis</p>
+                            <p class="text-xs text-yellow-700">
+                                Jadwal ini akan ditampilkan di dashboard sebagai pengingat wawancara. Pastikan untuk mengatur waktu yang tepat!
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Divider -->
@@ -278,4 +412,32 @@
     });
 </script>
 
+<!-- JavaScript untuk toggle interview field -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusRadios = document.querySelectorAll('.status-radio');
+    const interviewField = document.getElementById('interviewField');
+    
+    statusRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'interview') {
+                // Show with Alpine.js
+                interviewField.style.display = 'block';
+                // Trigger Alpine show
+                if (window.Alpine) {
+                    Alpine.$data(interviewField).show = true;
+                }
+            } else {
+                // Hide with Alpine.js
+                if (window.Alpine) {
+                    Alpine.$data(interviewField).show = false;
+                }
+                setTimeout(() => {
+                    interviewField.style.display = 'none';
+                }, 200);
+            }
+        });
+    });
+});
+</script>
 @endsection

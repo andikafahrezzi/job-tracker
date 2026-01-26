@@ -150,44 +150,145 @@
                 @enderror
             </div>
 
-            <!-- Status -->
-            <div class="space-y-2">
-                <label for="status" class="flex items-center gap-2 text-sm font-bold text-gray-700">
-                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+           <!-- Status Selection dengan Visual Feedback yang Jelas -->
+<div>
+    <label for="status" class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+        <span>Status Lamaran</span>
+        <span class="text-red-500">*</span>
+    </label>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <!-- Daftar -->
+        <label class="relative cursor-pointer group">
+            <input type="radio" 
+                   name="status" 
+                   value="daftar" 
+                   class="peer sr-only" 
+                   {{ old('status', $application->status ?? 'daftar') === 'daftar' ? 'checked' : '' }}>
+            
+            <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                        peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                        hover:border-blue-400 hover:bg-blue-50 hover:scale-102
+                        active:scale-95">
+                
+                <!-- Checkmark Badge -->
+                <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                     </svg>
-                    <span>Status Lamaran</span>
-                    <span class="text-red-500">*</span>
-                </label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    @foreach(['daftar' => ['color' => 'blue', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'], 
-                              'interview' => ['color' => 'yellow', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'], 
-                              'diterima' => ['color' => 'green', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'], 
-                              'ditolak' => ['color' => 'red', 'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z']] as $status => $config)
-                        <label class="relative cursor-pointer group">
-                            <input type="radio" 
-                                   name="status" 
-                                   value="{{ $status }}" 
-                                   class="peer sr-only" 
-                                   {{ old('status', 'daftar') === $status ? 'checked' : '' }}>
-                            <div class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all peer-checked:border-{{ $config['color'] }}-500 peer-checked:bg-{{ $config['color'] }}-50 peer-checked:shadow-lg peer-checked:shadow-{{ $config['color'] }}-500/30 hover:border-{{ $config['color'] }}-300 hover:bg-{{ $config['color'] }}-50/50">
-                                <svg class="w-6 h-6 text-{{ $config['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $config['icon'] }}"/>
-                                </svg>
-                                <span class="text-xs font-bold text-gray-700 peer-checked:text-{{ $config['color'] }}-700">{{ ucfirst($status) }}</span>
-                            </div>
-                        </label>
-                    @endforeach
                 </div>
-                @error('status')
-                    <p class="flex items-center gap-1 text-sm text-red-600 font-medium mt-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        {{ $message }}
-                    </p>
-                @enderror
+                
+                <!-- Icon -->
+                <div class="p-2 rounded-lg bg-blue-100 transition-all duration-200 peer-checked:bg-green-100">
+                    <svg class="w-6 h-6 text-blue-600 peer-checked:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                
+                <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Daftar</span>
             </div>
+        </label>
+
+        <!-- Interview -->
+        <label class="relative cursor-pointer group">
+            <input type="radio" 
+                   name="status" 
+                   value="interview" 
+                   class="peer sr-only" 
+                   {{ old('status', $application->status ?? 'daftar') === 'interview' ? 'checked' : '' }}>
+            
+            <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                        peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                        hover:border-yellow-400 hover:bg-yellow-50 hover:scale-102
+                        active:scale-95">
+                
+                <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <div class="p-2 rounded-lg bg-yellow-100 transition-all duration-200 peer-checked:bg-green-100">
+                    <svg class="w-6 h-6 text-yellow-600 peer-checked:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                
+                <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Interview</span>
+            </div>
+        </label>
+
+        <!-- Diterima -->
+        <label class="relative cursor-pointer group">
+            <input type="radio" 
+                   name="status" 
+                   value="diterima" 
+                   class="peer sr-only" 
+                   {{ old('status', $application->status ?? 'daftar') === 'diterima' ? 'checked' : '' }}>
+            
+            <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                        peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                        hover:border-green-400 hover:bg-green-50 hover:scale-102
+                        active:scale-95">
+                
+                <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <div class="p-2 rounded-lg bg-green-100 transition-all duration-200">
+                    <svg class="w-6 h-6 text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                
+                <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Diterima</span>
+            </div>
+        </label>
+
+        <!-- Ditolak -->
+        <label class="relative cursor-pointer group">
+            <input type="radio" 
+                   name="status" 
+                   value="ditolak" 
+                   class="peer sr-only" 
+                   {{ old('status', $application->status ?? 'daftar') === 'ditolak' ? 'checked' : '' }}>
+            
+            <div class="relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-gray-300 bg-white transition-all duration-200
+                        peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:shadow-xl peer-checked:shadow-green-500/40 peer-checked:scale-105 peer-checked:z-10
+                        hover:border-red-400 hover:bg-red-50 hover:scale-102
+                        active:scale-95">
+                
+                <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg opacity-0 scale-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <div class="p-2 rounded-lg bg-red-100 transition-all duration-200 peer-checked:bg-green-100">
+                    <svg class="w-6 h-6 text-red-600 peer-checked:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                
+                <span class="text-xs font-bold text-gray-700 peer-checked:text-green-700 transition-colors">Ditolak</span>
+            </div>
+        </label>
+    </div>
+    
+    @error('status')
+        <p class="flex items-center gap-1 text-sm text-red-600 font-medium mt-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ $message }}
+        </p>
+    @enderror
+</div>
 
             <!-- Divider -->
             <div class="border-t border-gray-200 pt-6">
